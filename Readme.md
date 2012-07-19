@@ -36,6 +36,29 @@ mail.deliver (err, response) ->
 	# email sent
 ```
 
+## Views
+
+If your emails contain dynamic information, why not to use all those template engines you love?
+
+```coffee-script
+Mailman.viewsPath = "#{ __dirname }/views"
+
+class Notifier extends Mailman.Model
+	from: 'support@newapp.com'
+	subject: 'NewApp launched!'
+	view: 'notifier' # Mailman will auto-guess the extension.
+					 # This field is optional, class' name will be taken by default.
+
+Notifier = Mailman.setup Notifier
+
+mail = new Notifier
+mail.to = 'recipient@gmail.com'
+mail.name = 'Steve'
+mail.surname = 'Jobs'
+mail.deliver (err, response) ->
+	# email sent
+```
+
 # Tests
 
 Put in your auth credentials into **test/mailman.test.coffee** and run `mocha` in Terminal.

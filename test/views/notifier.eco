@@ -1,0 +1,3 @@
+Hey, <%= @name %><br>
+
+<i>You rock!</i>
