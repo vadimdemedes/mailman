@@ -39,7 +39,7 @@ mail.deliver (err, response) ->
 If your emails contain dynamic information, why not to use all those template engines you love?
 
 ```coffee-script
-Mailman.viewsPath = "#{ __dirname }/views"
+Mailman.viewsDir = "#{ __dirname }/views"
 
 class Notifier extends Mailman.Model
 	from: 'support@newapp.com'
