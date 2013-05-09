@@ -25,6 +25,16 @@ class Notifier extends Mailman.Model
 	text: 'Yes yes yes, you heard it.'
 ```
 
+### For JS-only folks
+
+```javascript
+var Notifier = Mailman.Model.extend({
+	from: 'support@newapp.com',
+	subject: 'NewApp launched!',
+	text: 'Yes yes yes, you heard it.'
+});
+```
+
 ## Sending
 
 ```coffee-script
