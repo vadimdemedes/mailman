@@ -8,6 +8,10 @@
 	"engine": {
 		"node": ">= 0.4"
 	},
+	"repository": {
+	  "type": "git",
+	  "url": "https://github.com/vdemedes/mailman.git"  
+	},
 	"dependencies": {
 		"nodemailer": "0.4.1",
 		"templato": "0.1.0",
