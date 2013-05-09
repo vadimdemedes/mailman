@@ -1,7 +1,7 @@
 {
 	"name": "mailman",
 	"description": "Send emails in a comfortable way via models.",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"author": "Vadim Demedes <sbioko@gmail.com>",
 	"license": "MIT",
 	"index": "./index.js",

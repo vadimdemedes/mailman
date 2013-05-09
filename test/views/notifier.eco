@@ -1,3 +1,5 @@
 Hey, <%= @name %><br>
 
+We finally launched, thanks for all your support!
+
 <i>You rock!</i>

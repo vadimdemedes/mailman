@@ -16,18 +16,14 @@ class Mailman
 		params.secureConnection = !! params.ssl
 		@transport = Mailer.createTransport transport, params
 	
-	@setup: (model) ->
-		model::transport = @transport
-		model::className = model.name
-		model
-	
 class Mailman.Model	
 	constructor: ->
 		@attachments = []
 		@generateTextFromHTML = yes
+		@transport = Mailman.transport
 	
 	deliver: (callback) ->
-		keys = ['from', 'to', 'cc', 'bcc', 'replyTo', 'subject', 'text', 'html', 'headers', 'attachments', 'encoding', 'className', 'template']
+		keys = ['from', 'to', 'cc', 'bcc', 'replyTo', 'subject', 'text', 'html', 'headers', 'attachments', 'encoding', 'view']
 		params = {}
 		variables = {}
 		
@@ -43,7 +39,7 @@ class Mailman.Model
 		
 		if not (@text or @html)
 			if not @template
-				exec "find #{ Mailman.viewsPath } -iname '#{ @view or @className.toLowerCase() }*' -exec echo {} \\;", (err, stdout) =>
+				exec "find #{ Mailman.viewsPath } -iname '#{ params.view or @className.toLowerCase() }*' -exec echo {} \\;", (err, stdout) =>
 					stdout = stdout.trim()
 					fs.readFile stdout, 'utf-8', (err, source) =>
 						@template = new Templato

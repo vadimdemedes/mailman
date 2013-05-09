@@ -15,8 +15,6 @@ describe 'Mailman', ->
 					subject: 'We launched!'
 					view: 'notifier'
 				
-				Notifier = Mailman.setup Notifier
-				
 				mail = new Notifier
 				mail.to = 'test@gmail.com'
 				mail.name = 'Steve'
