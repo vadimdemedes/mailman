@@ -1,7 +1,7 @@
 {
 	"name": "mailman",
 	"description": "Send emails in a comfortable way via models.",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"author": "Vadim Demedes <sbioko@gmail.com>",
 	"license": "MIT",
 	"index": "./index.js",
@@ -9,8 +9,10 @@
 		"node": ">= 0.4"
 	},
 	"dependencies": {
-		"nodemailer": "latest",
-		"templato": "0.1.0"
+		"nodemailer": "0.4.1",
+		"templato": "0.1.0",
+		"lodash": "1.2.1",
+		"glob": "3.2.1"
 	},
 	"devDependencies": {
 		"should": "latest"
