@@ -23,8 +23,6 @@ class Notifier extends Mailman.Model
 	from: 'support@newapp.com'
 	subject: 'NewApp launched!'
 	text: 'Yes yes yes, you heard it.'
-
-Notifier = Mailman.setup Notifier # this is required
 ```
 
 ## Sending
@@ -48,8 +46,6 @@ class Notifier extends Mailman.Model
 	subject: 'NewApp launched!'
 	view: 'notifier' # Mailman will auto-guess the extension.
 					 # This field is optional, class' name will be taken by default.
-
-Notifier = Mailman.setup Notifier
 
 mail = new Notifier
 mail.to = 'recipient@gmail.com'
