@@ -8,7 +8,7 @@ describe 'Mailman', ->
 			it 'should send out an email', (done) ->
 				Mailman.connect host: 'smtp.server.com', service: 'smtp', port: 587, user: 'user', password: 'password', ssl: no
 				
-				Mailman.viewsPath = "#{ __dirname }/views"
+				Mailman.viewsDir = "#{ __dirname }/views"
 				
 				class Notifier extends Mailman.Model
 					from: 'test@test.com'
