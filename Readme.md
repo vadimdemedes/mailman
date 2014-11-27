@@ -2,6 +2,14 @@
 
 Send emails in a comfortable way via models.
 
+## Features
+
+- Uses nodemailer under the hood to send out emails
+- All nodemailer transports (including 3rd-party ones) are supported
+- Uses [consolidate.js](https://github.com/tj/consolidate.js) to render email templates (views)
+- ActiveMailer-inspired API, very comfortable
+- Clean, simple and lightweight code base (176 sloc)
+
 ## Installation
 
 ```
