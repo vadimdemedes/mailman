@@ -2,6 +2,8 @@
 
 Send emails in a comfortable way via models.
 
+[![Circle CI](https://circleci.com/gh/vdemedes/mailman.svg?style=svg)](https://circleci.com/gh/vdemedes/mailman)
+
 ## Features
 
 - Uses nodemailer under the hood to send out emails
@@ -22,7 +24,8 @@ npm install mailman --save
 node --harmony something.js
 ```
 
-**Note**: In order for the following examples to work, you need use something like [co](https://github.com/tj/co).
+**Note**: In order for the following examples to work, you need use something like [co](https://github.com/tj/co) to run generators.
+**Another note**: If you want to use ES6 classes (like in the following examples), use [6to5](https://github.com/6to5/6to5). If not, there is an alternative API left from previous versions of Mailman.
 
 
 ## Usage
@@ -104,31 +107,31 @@ Each of the emails is represented as a usual function, which should set template
 **Note**: Email function name **must** be the same as its view name (camelCased)
 
 ```javascript
-var UserMailer = Mailman.Mailer.extend({
+class UserMailer extends Mailman.Mailer {
     // need to manually set mailer name
     // UserMailer => user
-    name: 'user', 
+    get name () { return 'user'; }
     
     // default from for all emails
-    from: 'sender@sender.com',
+    get from () { return 'sender@sender.com'; }
     
     // default subject for all emails
-    subject: 'Hello World',
+    get subject () { return 'Hello World'; }
     
     // welcome email
-    welcome: function () {
+    welcome () {
         // set all your template variables
         // on this
         
         this.full_name = 'John Doe';
         this.currentDate = new Date();
-    },
+    }
     
     // forgot password email
-    forgotPassword: function () {
+    forgotPassword () {
         this.token = 12345;
     }
-});
+}
 ```
 
 To send out each of these emails, simply:
