@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "babel": "^5.6.4",
+    "babel-runtime": "^5.6.4",
     "chai": "^1.10.0",
     "co": "^4.0.0",
     "ejs": "^1.0.0",

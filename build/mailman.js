@@ -4,11 +4,15 @@
 
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
-function _slicedToArray(arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+var _slicedToArray = require('babel-runtime/helpers/sliced-to-array')['default'];
+
+var _regeneratorRuntime = require('babel-runtime/regenerator')['default'];
+
+var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
 
 var Class = require('class-extend');
 
@@ -155,12 +159,12 @@ var Mail = (function () {
 
   _createClass(Mail, [{
     key: 'deliver',
-    value: regeneratorRuntime.mark(function deliver() {
+    value: _regeneratorRuntime.mark(function deliver() {
       var options;
-      return regeneratorRuntime.wrap(function deliver$(context$2$0) {
+      return _regeneratorRuntime.wrap(function deliver$(context$2$0) {
         while (1) switch (context$2$0.prev = context$2$0.next) {
           case 0:
-            options = Object.assign({}, this.options);
+            options = _Object$assign({}, this.options);
             context$2$0.next = 3;
             return Mailman.renderView(options.view, this.locals);
 
@@ -196,7 +200,7 @@ var Mailer = (function () {
 
     _classCallCheck(this, Mailer);
 
-    Object.assign(this, options);
+    _Object$assign(this, options);
 
     if (!this.transport) this.transport = Mailman.transport;
 
