@@ -1,232 +1,265 @@
-"use strict";
-
-var _slicedToArray = function (arr, i) {
-  if (Array.isArray(arr)) {
-    return arr;
-  } else {
-    var _arr = [];
-
-    for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-      _arr.push(_step.value);
-
-      if (i && _arr.length === i) break;
-    }
-
-    return _arr;
-  }
-};
-
 /**
  * Dependencies
  */
 
-var Class = require("class-extend");
+'use strict';
 
-var nodemailer = require("nodemailer");
-var thunkify = require("thunkify");
-var basename = require("path").basename;
-var views = require("co-views");
-var util = require("./util");
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
+
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
+
+var _slicedToArray = require('babel-runtime/helpers/sliced-to-array')['default'];
+
+var _regeneratorRuntime = require('babel-runtime/regenerator')['default'];
+
+var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
+
+var Class = require('class-extend');
+
+var nodemailer = require('nodemailer');
+var thunkify = require('thunkify');
+var basename = require('path').basename;
+var views = require('co-views');
+var util = require('./util');
 
 var walk = util.walk;
-
 
 /**
  * Mailman
  */
 
-var Mailman = function Mailman() {};
+var Mailman = (function () {
+  function Mailman() {
+    _classCallCheck(this, Mailman);
+  }
 
-Mailman.configure = function (service, auth) {
-  var transport = undefined;
+  _createClass(Mailman, null, [{
+    key: 'configure',
+    value: function configure(service, auth) {
+      var transport = undefined;
 
-  // if service is a string, assume that it's
-  // one of the nodemailer-wellknown
-  // supported services
-  // see https://github.com/andris9/nodemailer-wellknown#supported-services
-  if ("string" === typeof service) {
-    transport = nodemailer.createTransport({
-      service: service,
-      auth: {
-        user: auth.user,
-        pass: auth.password
+      // if service is a string, assume that it's
+      // one of the nodemailer-wellknown
+      // supported services
+      // see https://github.com/andris9/nodemailer-wellknown#supported-services
+      if ('string' === typeof service) {
+        transport = nodemailer.createTransport({
+          service: service,
+          auth: {
+            user: auth.user,
+            pass: auth.password
+          }
+        });
       }
-    });
-  }
 
-  if ("object" === typeof service) {
-    if ("undefined" === typeof service.sendMail) {
-      // if no sendMail property, assume
-      // that it's just normal object
+      if ('object' === typeof service) {
+        if ('undefined' === typeof service.sendMail) {
+          // if no sendMail property, assume
+          // that it's just normal object
 
-      transport = nodemailer.createTransport(service);
-    } else {
-      // else, it must be initialized
-      // 3rd-party transport
-      transport = service;
+          transport = nodemailer.createTransport(service);
+        } else {
+          // else, it must be initialized
+          // 3rd-party transport
+          transport = service;
+        }
+      }
+
+      // transform sendMail into co-compatible fn
+      transport.sendMail = thunkify(transport.sendMail);
+
+      // set this transport as a default
+      return this.transport = transport;
     }
-  }
+  }, {
+    key: 'scanViews',
+    value: function scanViews() {
+      var path = this.options.views.path;
 
-  // transform sendMail into co-compatible fn
-  transport.sendMail = thunkify(transport.sendMail);
+      if (!path) {
+        throw new Error('Mailman.options.views.path is empty');
+      }
 
-  // set this transport as a default
-  return this.transport = transport;
-};
+      var files = walk(path);
+      var views = {};
 
-Mailman.scanViews = function () {
-  var path = this.options.views.path;
+      files.forEach(function (file) {
+        // /views/mailer_name/view_name.ejs => mailer_name
 
-  if (!path) {
-    throw new Error("Mailman.options.views.path is empty");
-  }
+        var _file$replace$split = file.replace(path + '/', '').split('/');
 
-  var files = walk(path);
-  var _views = {};
+        var _file$replace$split2 = _slicedToArray(_file$replace$split, 1);
 
-  files.forEach(function (file) {
-    // /views/mailer_name/view_name.ejs => mailer_name
-    var _ref = file.replace(path + "/", "").split("/");
+        var mailerName = _file$replace$split2[0];
 
-    var _ref2 = _slicedToArray(_ref, 1);
+        // /views/mailer_name/view_name.ejs => view_name
+        var viewName = basename(file).replace(/\.[a-z]{3,4}$/g, '');
 
-    var mailerName = _ref2[0];
+        // under_score to camelCase
+        viewName = viewName.replace(/\_[a-z0-9]/gi, function ($1) {
+          return $1.slice(1).toUpperCase();
+        });
 
+        if (!views[mailerName]) views[mailerName] = {};
 
-    // /views/mailer_name/view_name.ejs => view_name
-    var viewName = basename(file).replace(/\.[a-z]{3,4}$/g, "");
+        // register view and store it's relative path
+        views[mailerName][viewName] = mailerName + '/' + basename(file);
+      });
 
-    // under_score to camelCase
-    viewName = viewName.replace(/\_[a-z0-9]/gi, function ($1) {
-      return $1.slice(1).toUpperCase();
-    });
+      this.views = views;
+    }
+  }, {
+    key: 'renderView',
+    value: function renderView(path, locals) {
+      if (!this.render) {
+        var options = this.options.views;
 
-    if (!_views[mailerName]) _views[mailerName] = {};
+        this.render = views(options.path, {
+          cache: options.cache,
+          'default': options['default'],
+          map: options.map
+        });
+      }
 
-    // register view and store it's relative path
-    _views[mailerName][viewName] = mailerName + "/" + basename(file);
-  });
+      return this.render(path, locals);
+    }
+  }, {
+    key: 'send',
+    value: function send(options) {
+      return this.transport.sendMail(options);
+    }
+  }]);
 
-  this.views = _views;
-};
-
-Mailman.renderView = function (path, locals) {
-  if (!this.render) {
-    var _options = this.options.views;
-
-    this.render = views(_options.path, {
-      cache: _options.cache,
-      "default": _options["default"],
-      map: _options.map
-    });
-  }
-
-  return this.render(path, locals);
-};
-
-Mailman.send = function (options) {
-  return this.transport.sendMail(options);
-};
+  return Mailman;
+})();
 
 Mailman.options = {
   views: {
-    path: "",
+    path: '',
     cache: false,
-    "default": "",
+    'default': '',
     map: {}
   }
 };
-
 
 /**
  * Mail
  */
 
+var Mail = (function () {
+  function Mail() {
+    var options = arguments[0] === undefined ? {} : arguments[0];
+    var locals = arguments[1] === undefined ? {} : arguments[1];
 
-var Mail = function Mail(options, locals) {
-  if (options === undefined) options = {};
-  if (locals === undefined) locals = {};
-  this.options = options;
-  this.locals = locals;
-};
+    _classCallCheck(this, Mail);
 
-Mail.prototype.deliver = function* () {
-  // clone this.options
-  var _options2 = Object.assign({}, this.options);
+    this.options = options;
+    this.locals = locals;
+  }
 
-  // render email body
-  _options2.html = yield Mailman.renderView(_options2.view, this.locals);
+  _createClass(Mail, [{
+    key: 'deliver',
+    value: _regeneratorRuntime.mark(function deliver() {
+      var options;
+      return _regeneratorRuntime.wrap(function deliver$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            options = _Object$assign({}, this.options);
+            context$2$0.next = 3;
+            return Mailman.renderView(options.view, this.locals);
 
-  yield Mailman.send(_options2);
-};
+          case 3:
+            options.html = context$2$0.sent;
+            context$2$0.next = 6;
+            return Mailman.send(options);
 
+          case 6:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, deliver, this);
+    })
+  }]);
 
-
+  return Mail;
+})();
 
 /**
  * Mailer
  */
 
 // list of supported nodemailer options
-var supportedOptions = ["from", "to", "cc", "bcc", "replyTo", "inReplyTo", "references", "subject", "headers", "envelope", "messageId", "date", "encoding"];
+var supportedOptions = ['from', 'to', 'cc', 'bcc', 'replyTo', 'inReplyTo', 'references', 'subject', 'headers', 'envelope', 'messageId', 'date', 'encoding'];
 
 // mailman properties to ignore
-var ignoredKeys = ["name", "transport"];
+var ignoredKeys = ['name', 'transport'];
 
-var Mailer = function Mailer(options) {
-  if (options === undefined) options = {};
-  Object.assign(this, options);
+var Mailer = (function () {
+  function Mailer() {
+    var options = arguments[0] === undefined ? {} : arguments[0];
 
-  if (!this.transport) this.transport = Mailman.transport;
+    _classCallCheck(this, Mailer);
 
-  if (!Mailman.views) Mailman.scanViews();
+    _Object$assign(this, options);
 
-  // iterate over this object
-  for (var key in this) {
-    // if this method name registered
-    // as a view, wrap it into Mail factory
-    if (Mailman.views[this.name] && Mailman.views[this.name][key]) {
-      this[key] = factory(this, key);
-    }
-  }
-};
+    if (!this.transport) this.transport = Mailman.transport;
 
-Mailer.prototype.options = function () {
-  var _this = this;
-  var _options3 = {};
+    if (!Mailman.views) Mailman.scanViews();
 
-  // get only nodemailer supported properties
-  supportedOptions.forEach(function (key) {
-    return _options3[key] = _this[key];
-  });
-
-  return _options3;
-};
-
-Mailer.prototype.locals = function () {
-  var _locals = {};
-
-  for (var key in this) {
-    var value = this[key];
-
-    // ignored keys, mailer name and transport
-    var isIgnored = ignoredKeys.includes(key);
-
-    // nodemailer options
-    var isOption = supportedOptions.includes(key);
-
-    // also, don't append functions
-    var isFunction = "function" === typeof value;
-
-    // if none of those is true
-    // apend new template variable
-    if (!isIgnored && !isOption && !isFunction) {
-      _locals[key] = value;
+    // we need to find any views defined on the Mailer
+    for (var key in Mailman.views[this.name]) {
+      // if this view is registered
+      // as a method, wrap it into Mail factory
+      if (this[key]) {
+        this[key] = factory(this, key);
+      }
     }
   }
 
-  return _locals;
-};
+  _createClass(Mailer, [{
+    key: 'options',
+    value: function options() {
+      var _this = this;
+
+      var options = {};
+
+      // get only nodemailer supported properties
+      supportedOptions.forEach(function (key) {
+        return options[key] = _this[key];
+      });
+
+      return options;
+    }
+  }, {
+    key: 'locals',
+    value: function locals() {
+      var locals = {};
+
+      for (var key in this) {
+        var value = this[key];
+
+        // ignored keys, mailer name and transport
+        var isIgnored = ignoredKeys.indexOf(key) >= 0;
+
+        // nodemailer options
+        var isOption = supportedOptions.indexOf(key) >= 0;
+
+        // also, don't append functions
+        var isFunction = 'function' === typeof value;
+
+        // if none of those is true
+        // apend new template variable
+        if (!isIgnored && !isOption && !isFunction) {
+          locals[key] = value;
+        }
+      }
+
+      return locals;
+    }
+  }]);
+
+  return Mailer;
+})();
 
 Mailer.extend = Class.extend;
 
@@ -239,22 +272,25 @@ function factory(mailer, method) {
   return function () {
     fn.apply(mailer, arguments);
 
-    var _options4 = mailer.options();
-    var _locals2 = mailer.locals();
+    var options = mailer.options();
+    var locals = mailer.locals();
 
     // get path for a view
-    _options4.view = Mailman.views[this.name][method];
+    options.view = Mailman.views[this.name][method];
 
-    return new Mail(_options4, _locals2);
+    return new Mail(options, locals);
   };
 }
-
 
 /**
  * Expose `Mailman`
  */
 
-var exports = module.exports = Mailman;
+var _exports = module.exports = Mailman;
 
-exports.Mailer = Mailer;
-exports.Mail = Mail;
+_exports.Mailer = Mailer;
+_exports.Mail = Mail;
+
+// clone this.options
+
+// render email body

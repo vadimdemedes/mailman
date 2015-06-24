@@ -1,47 +1,45 @@
-"use strict";
-
 /**
  * Dependencies
  */
 
-var fs = require("fs");
+'use strict';
 
+var fs = require('fs');
 
 /**
  * Expose utilities
  */
 
-var exports = module.exports;
+var _exports = module.exports;
 
-exports.walk = walk;
-
+_exports.walk = walk;
 
 /**
  * Utilities
  */
 
 function walk(path) {
-  var files = [];
+	var files = [];
 
-  // readdir returns only file names
-  // convert them to full path
-  files = fs.readdirSync(path).map(function (file) {
-    return "" + path + "/" + file;
-  });
+	// readdir returns only file names
+	// convert them to full path
+	files = fs.readdirSync(path).map(function (file) {
+		return path + '/' + file;
+	});
 
-  var index = 0;
-  var file = undefined;
+	var index = 0;
+	var file = undefined;
 
-  while (file = files[index++]) {
-    var stat = fs.lstatSync(file);
-    // if directory append its contents
-    // after current array item
-    if (stat.isDirectory()) {
-      var args = walk(file);
-      args.unshift(index - 1, 1);
-      files.splice.apply(files, args);
-    }
-  }
+	while (file = files[index++]) {
+		var stat = fs.lstatSync(file);
+		// if directory append its contents
+		// after current array item
+		if (stat.isDirectory()) {
+			var args = walk(file);
+			args.unshift(index - 1, 1);
+			files.splice.apply(files, args);
+		}
+	}
 
-  return files;
+	return files;
 }

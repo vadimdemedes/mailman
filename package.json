@@ -28,10 +28,12 @@
     "url": "https://github.com/vdemedes/mailman/issues"
   },
   "engines": {
-    "node": ">= 0.11.x"
+    "node": ">= 0.11.x",
+    "iojs": ">= 2.0.1"
   },
   "devDependencies": {
-    "6to5": "^2.7.2",
+    "babel": "^5.6.4",
+    "babel-runtime": "^5.6.4",
     "chai": "^1.10.0",
     "co": "^4.0.0",
     "ejs": "^1.0.0",

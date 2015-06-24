@@ -25,7 +25,7 @@ node --harmony something.js
 ```
 
 **Note**: In order for the following examples to work, you need use something like [co](https://github.com/tj/co) to run generators.
-**Another note**: If you want to use ES6 classes (like in the following examples), use [6to5](https://github.com/6to5/6to5). If not, there is an alternative API left from previous versions of Mailman.
+**Another note**: If you want to use ES6 classes (like in the following examples), use [babel](https://github.com/babel/babel). If not, there is an alternative API left from previous versions of Mailman.
 
 
 ## Usage
@@ -70,7 +70,7 @@ Mailman.configure({
    auth: {
        user: 'user@gmail.com',
        pass: 'password'
-   } 
+   }
 });
 ```
 
@@ -111,22 +111,22 @@ class UserMailer extends Mailman.Mailer {
     // need to manually set mailer name
     // UserMailer => user
     get name () { return 'user'; }
-    
+
     // default from for all emails
     get from () { return 'sender@sender.com'; }
-    
+
     // default subject for all emails
     get subject () { return 'Hello World'; }
-    
+
     // welcome email
     welcome () {
         // set all your template variables
         // on this
-        
+
         this.full_name = 'John Doe';
         this.currentDate = new Date();
     }
-    
+
     // forgot password email
     forgotPassword () {
         this.token = 12345;
